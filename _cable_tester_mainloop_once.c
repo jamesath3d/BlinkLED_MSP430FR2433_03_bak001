@@ -82,11 +82,9 @@ uint8_t _cable_tester_mainloop_onceX2(void){
     _CB_PR_12hex_rn("after zero , up state : ", 2 , _up6x2);
 
     _crt = 0 ;
-    _wireAmount = 0 ;
     for ( __ii = 11 ; __ii >= 0 ; __ii -- ){
         _fff6x2[__ii] = (_inv6x2[__ii] ^ 0xff);
         if ( _up6x2[__ii] != _inv6x2[__ii]) { _crt ++ ; }
-        _wireAmount += _bit_count( _fff6x2[__ii]);
     }
     _CB_PR_12hex_rn("default INV  vector :   ", 2 , _inv6x2);
     _CB_PR_12hex_rn("default test vector :   ", 2 , _fff6x2);
@@ -101,7 +99,12 @@ uint8_t _cable_tester_mainloop_onceX3(void){
     int8_t __ii;
     uint8_t __rt;
 
+    _wireAmount = 0 ;
+    for ( __ii = 11 ; __ii >= 0 ; __ii -- ){
+        _wireAmount += _bit_count( _fff6x2[__ii]);
+    }
     _CB_PR_1hex_rn("==X3== total amount of the wires : ", "<-- it should be 0x20(32)", _wireAmount );
+
     for ( __ii = 0 ; __ii < _wireAmount ; __ii ++ ){
         __rt = _cable_tester_mainloop_onceXY(__ii);
         if ( __rt ){
