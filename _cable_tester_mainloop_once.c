@@ -12,6 +12,7 @@ static uint32_t _cbidx ;
 static uint8_t _co6x2[12];
 static uint8_t _up6x2[12];
 static uint8_t _crt;
+static uint8_t _cidx;
 static uint8_t _wireAmount ;
 
 static uint8_t _zzz6x2[12]={0,0,0,0,0,0, 0,0,0,0,0,0 };
@@ -25,15 +26,15 @@ inline uint8_t _cable_tester_mainloop_onceZ(uint8_t ___idx, uint8_t ___arr6[], u
     return 0;
 }
 
-inline uint8_t _cable_tester_mainloop_onceXY(uint8_t ___idx){
+inline uint8_t _cable_tester_mainloop_onceX3Y(void){
     int8_t __ii;
     int8_t __ok;
 
-    _CB_PR_1hex_rn(" checking No. <","> wire.", ___idx);
+    _CB_PR_1hex_rn(" checking No. <","> wire.", _cidx);
     for (__ii=11; __ii >= 0 ; __ii --){
         _ttt6x2[__ii] = 0;
     }
-    __ok = _cable_tester_mainloop_onceZ( ___idx , _ttt6x2 , 0 );
+    __ok = _cable_tester_mainloop_onceZ( _cidx , _ttt6x2 , 0 );
     if ( 0 == __ok ) {        return 0;    }
 
     return 0xFF ;
@@ -97,7 +98,6 @@ uint8_t _cable_tester_mainloop_onceX2(void){
 
 uint8_t _cable_tester_mainloop_onceX3(void){
     int8_t __ii;
-    uint8_t __rt;
 
     _wireAmount = 0 ;
     for ( __ii = 11 ; __ii >= 0 ; __ii -- ){
@@ -105,10 +105,10 @@ uint8_t _cable_tester_mainloop_onceX3(void){
     }
     _CB_PR_1hex_rn("==X3== total amount of the wires : ", "<-- it should be 0x20(32)", _wireAmount );
 
-    for ( __ii = 0 ; __ii < _wireAmount ; __ii ++ ){
-        __rt = _cable_tester_mainloop_onceXY(__ii);
-        if ( __rt ){
-            _CB_err_return3( "error found at NO.(", "), please check it. Exit....", 2 );
+    for ( _cidx = 0 ; _cidx < _wireAmount ; _cidx ++ ){
+        _crt = _cable_tester_mainloop_onceX3Y();
+        if ( _crt ){
+            _CB_err_return3( "error found at NO.(", "), please check it. Exit....", 32 );
         }
     }
 
