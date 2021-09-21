@@ -20,6 +20,7 @@ static uint8_t _inv6x2[12]={0xF0,0xF8,0xFF, 0xE0,0xFF,0xFF, 0xF0,0xF0,0xF0, 0x00
 static uint8_t _fff6x2[12];
 
 
+static uint8_t _vvv6x2[12];
 static uint8_t _ttt6x2[12];
 
 inline uint8_t _cable_tester_mainloop_onceZ(uint8_t ___idx, uint8_t ___arr6[], uint8_t ___rowIdx ){
@@ -27,17 +28,72 @@ inline uint8_t _cable_tester_mainloop_onceZ(uint8_t ___idx, uint8_t ___arr6[], u
 }
 
 inline uint8_t _cable_tester_mainloop_onceX3Y(void){
-    int8_t __ii;
-    int8_t __ok;
+    uint8_t __ii;
+    uint8_t __jj;
+    uint8_t __mm;
 
-    _CB_PR_1hex_rn(" checking No. <","> wire.", _cidx);
-    for (__ii=11; __ii >= 0 ; __ii --){
-        _ttt6x2[__ii] = 0;
+    _byte_set(12, _vvv6x2 , 0 );
+
+    __mm=_cidx;
+    for (__ii=0; __ii < 12 ; __ii ++){
+        __jj = _bit_count(_fff6x2[__ii]);
+        if ( __mm < __jj ) {
+            break ;
+        }
+        __mm -= __jj ;
     }
-    __ok = _cable_tester_mainloop_onceZ( _cidx , _ttt6x2 , 0 );
-    if ( 0 == __ok ) {        return 0;    }
 
-    return 0xFF ;
+
+
+    if ( 2 == 3 ) {
+        _CB_PR_1hex(" ii:", "", __ii);
+        _CB_PR_1hex(" jj:", "", __jj);
+        _CB_PR_1hex(" mm:", " ", __mm);
+    }
+
+    _vvv6x2[__ii] = _bit_set(__mm);
+
+    _CB_PR_12hex("wire vector : ", _cidx , _vvv6x2);
+    if ( 12 == __ii ) {
+        _CB_PR_rn();
+        return 95 ;
+    }
+
+    _I2C_EXPANDER01_RESET_ON();
+    _I2C_EXPANDER01_RESET_OFF();
+    _i2c_expander01_write6(0, _vvv6x2);
+    _i2c_expander01_write6(1, _vvv6x2 + 6);
+    _i2c_expander01_read6(2, _up6x2);
+    _i2c_expander01_read6(3, _up6x2 + 6 );
+    _CB_PR_12hex(", Pos : ", _cidx , _up6x2);
+
+    _bit_or( 12, _vvv6x2, _inv6x2, _ttt6x2 );
+
+    __ii = _byte_cmp(12, _ttt6x2, _up6x2 );
+
+    if ( __ii ) {
+        _CB_PR_12hex_rn(" failed, it should be : ", __ii , _ttt6x2);
+        return 91 ;
+    }
+
+    _bit_inv( 12, _vvv6x2, _ttt6x2 );
+
+    _I2C_EXPANDER01_RESET_ON();
+    _I2C_EXPANDER01_RESET_OFF();
+    _i2c_expander01_write6(0, _ttt6x2);
+    _i2c_expander01_write6(1, _ttt6x2 + 6);
+    _i2c_expander01_read6(2, _up6x2);
+    _i2c_expander01_read6(3, _up6x2 + 6 );
+    _CB_PR_12hex(" ok; Neg : ", _cidx , _up6x2);
+
+    __ii = _byte_cmp(12, _ttt6x2, _up6x2 );
+    if ( __ii ) {
+        _CB_PR_12hex_rn(" failed, it should be : ", __ii , _ttt6x2);
+        return 92 ;
+    }
+
+    _CB_PR_rn();
+    return 0 ;
 }
 
 // test the i2c bus's slave device and all the pins of the io-expanders.

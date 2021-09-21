@@ -32,7 +32,13 @@
 #define _READbit_(name) (_PinT(name) & _BbitT(name))
 
 uint8_t _bit_count(uint8_t ___byte);
+uint8_t _bit_set(uint8_t ___byte);
 void _byte_set(uint8_t ___cnt, uint8_t ___arr[] , uint8_t ___byte);
 uint8_t _byte_cmp(uint8_t ___cnt, uint8_t ___arr1[], uint8_t ___arr2[]);
+
+void _bit_and(uint8_t ___cnt, uint8_t ___A[], uint8_t ___B[], uint8_t ___O[] );
+void _bit_or(uint8_t  ___cnt, uint8_t ___A[], uint8_t ___B[], uint8_t ___O[] );
+void _bit_xor(uint8_t ___cnt, uint8_t ___A[], uint8_t ___B[], uint8_t ___O[] );
+void _bit_inv(uint8_t ___cnt, uint8_t ___A[], uint8_t ___O[] );
 
 #endif
