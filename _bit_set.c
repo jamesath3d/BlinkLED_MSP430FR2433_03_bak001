@@ -66,10 +66,22 @@ void _byte_set(uint8_t ___cnt, uint8_t ___arr[] , uint8_t ___byte){
 uint8_t _byte_cmp(uint8_t ___cnt, uint8_t ___arr1[], uint8_t ___arr2[]){
     uint8_t __rt ; 
     uint8_t __ii ; 
+    uint8_t __jj ; 
     __rt = 0 ;
+    __jj = 0 ;
     for ( __ii = 0 ; __ii < ___cnt ; __ii ++ ) {
         if ( ___arr1[__ii] != ___arr2[__ii]  ) {
             __rt ++ ;
+            if ( 0 == __jj ) {
+                __jj = __ii ;
+            }
+        }
+    }
+    if ( __rt ) {
+        __rt <<= 4 ; // high 4 bit : amount of diffences
+        __rt |= ( __jj & 0x0F ) ; // low 4 bit : the first error byte
+        if ( 0 == __rt ) {
+            __rt = 0xFF ; // to prevent unexpect.
         }
     }
     return __rt ;
