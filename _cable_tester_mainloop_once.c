@@ -17,25 +17,30 @@ static uint8_t _cGood;
 static uint8_t _cBad;
 static uint8_t _wireAmount ;
 
-static uint8_t _zzz6x2[12]={0,0,0,0,0,0, 0,0,0,0,0,0 };
-static uint8_t _inv6x2[12]={0xF0,0xF8,0xFF, 0xE0,0xFF,0xFF, 0xF0,0xF0,0xF0, 0x00,0xFF,0xFF};
+static uint8_t _zzz6x2[12]   ={0,0,0,0,0,0, 0,0,0,0,0,0 };
+static uint8_t _inv6x2[12]   ={0xF0,0xF8, 0xFF,0xE0, 0xFF,0xFF, 0xF0,0xF0, 0xF0,0x00, 0xFF,0xFF};
+static uint8_t _switch6x2[12]={0x00,0x00, 0x00,0xff, 0x00,0x00, 0xff,0x00, 0x00,0x00, 0x00,0x00};
 static uint8_t _fff6x2[12];
 
 
 static uint8_t _vvv6x2[12];
+static uint8_t _ccc6x2[12];
 static uint8_t _ttt6x2[12];
 
-inline uint8_t _cable_tester_mainloop_onceZ(uint8_t ___idx, uint8_t ___arr6[], uint8_t ___rowIdx ){
-    return 0;
-} // _cable_tester_mainloop_onceZ
-
+inline uint8_t _cable_tester_bit_calc(uint8_t ___byte_idx, uint8_t ___bit_idx ){
+    uint8_t __rt;
+    __rt = _bit_set(___bit_idx);
+    return __rt ;
+} // _cable_tester_bit_calc
 inline uint8_t _cable_tester_mainloop_onceX3Y(void){
     uint8_t __ii;
     uint8_t __jj;
     uint8_t __mm;
     uint8_t __rt;
+    uint8_t __switch;
 
     __rt = 0 ;
+    __switch = 0 ;
     _byte_set(12, _vvv6x2 , 0 );
 
     __mm=_cidx;
@@ -43,6 +48,14 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
         __jj = _bit_count(_fff6x2[__ii]);
         if ( __mm < __jj ) {
             _vvv6x2[__ii] = _bit_set(__mm);
+            __switch = _switch6x2[ __ii ] ;
+
+            if ( __switch ) {
+                _ccc6x2[__ii] = _cable_tester_bit_calc(__ii, __mm);
+            } else {
+                _ccc6x2[__ii] = _vvv6x2[__ii] ;
+            }
+
             break ;
         }
         __mm -= __jj ;
@@ -51,9 +64,9 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
 
 
     if ( 2 == 3 ) {
-        _CB_PR_1hex(" ii:", "", __ii);
-        _CB_PR_1hex(" jj:", "", __jj);
-        _CB_PR_1hex(" mm:", " ", __mm);
+        _CB_PR_1hex_u8(" ii:", "", __ii);
+        _CB_PR_1hex_u8(" jj:", "", __jj);
+        _CB_PR_1hex_u8(" mm:", " ", __mm);
     }
 
 
@@ -62,6 +75,7 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
         _CB_PR_rn();
         return 95 ;
     }
+    _CB_PR_1hex(",", ", ", _ccc6x2[__ii] );
 
     _I2C_EXPANDER01_RESET_ON();
     _I2C_EXPANDER01_RESET_OFF();
@@ -100,13 +114,13 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
 
     if ( __rt ) {
         _cBad ++ ;
-        _CB_PR_1hex_rn(". bad.========", "", _cBad );
+        _CB_PR_1hex_u8_rn(". bad.========", "", _cBad );
         return 92 ;
     }
 
     _cGood ++ ;
     //_CB_PR_str_rn(" ok.----------------------------------" );
-    _CB_PR_1hex_rn(" ok.----------------------------------", "", _cGood );
+    _CB_PR_1hex_u8_rn(" ok.----------------------------------", "", _cGood );
     return 0 ;
 } // _cable_tester_mainloop_onceX3Y
 
@@ -125,7 +139,7 @@ uint8_t _cable_tester_mainloop_onceX1(void){
     _CB_PR_12hex_rn("init state : col : ", 0 , _co6x2);
     _CB_PR_12hex_rn("init state : up  : ", 2 , _up6x2 );
 
-    _CB_PR_1hex_rn(" read bytes amount: 0x","<<-- it should be 0x18(24). OK.", _crt);
+    _CB_PR_1hex_u8_rn(" read bytes amount: 0x","<<-- it should be 0x18(24). OK.", _crt);
     if ( 0x18 != _crt ){
         _CB_err_return(11);
     }
@@ -137,7 +151,7 @@ uint8_t _cable_tester_mainloop_onceX1(void){
     __rt = _byte_cmp(12, _ttt6x2, _co6x2 );
 //        +  _byte_cmp(12, _ttt6x2, _up6x2 );
 
-    _CB_PR_1hex_rn(" step 12: i2c expander PIN's float tested differency : " , " <<-- should be zero.", __rt);
+    _CB_PR_1hex_u8_rn(" step 12: i2c expander PIN's float tested differency : " , " <<-- should be zero.", __rt);
     return __rt ;
 } // _cable_tester_mainloop_onceX1
 
@@ -160,7 +174,7 @@ uint8_t _cable_tester_mainloop_onceX2(void){
     _CB_PR_12hex_rn("default INV  vector :   ", 2 , _inv6x2);
     _CB_PR_12hex_rn("default test vector :   ", 2 , _fff6x2);
 
-    _CB_PR_1hex_rn(" comparing diffence between  amount : ", "<-- it should be zero", _crt );
+    _CB_PR_1hex_u8_rn(" comparing diffence between  amount : ", "<-- it should be zero", _crt );
     if( _crt ) {_CB_err_return( 3 );}
 
     return 0 ;
@@ -173,7 +187,7 @@ uint8_t _cable_tester_mainloop_onceX3(void){
     for ( __ii = 11 ; __ii >= 0 ; __ii -- ){
         _wireAmount += _bit_count( _fff6x2[__ii]);
     }
-    _CB_PR_1hex_rn("==X3== total amount of the wires : ", "<-- it should be 0x20(32)", _wireAmount );
+    _CB_PR_1hex_u8_rn("==X3== total amount of the wires : ", "<-- it should be 0x20(32)", _wireAmount );
 
     _crt = 0 ;
     _cGood = 0 ;
@@ -218,7 +232,7 @@ uint8_t _cable_tester_mainloop_once(void){
 
 
     if ( __rt ) {
-        _CB_PR_1hex_rn(" End with error code : " , " <<-- should be zero \r\n", __rt);
+        _CB_PR_1hex_u8_rn(" End with error code : " , " <<-- should be zero \r\n", __rt);
     } else {
         _CB_PR_str("Cable tester succeed end.\r\n");
     }
