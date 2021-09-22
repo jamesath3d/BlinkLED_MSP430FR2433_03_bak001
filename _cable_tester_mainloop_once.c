@@ -13,6 +13,8 @@ static uint8_t _co6x2[12];
 static uint8_t _up6x2[12];
 static uint8_t _crt;
 static uint8_t _cidx;
+static uint8_t _cGood;
+static uint8_t _cBad;
 static uint8_t _wireAmount ;
 
 static uint8_t _zzz6x2[12]={0,0,0,0,0,0, 0,0,0,0,0,0 };
@@ -67,7 +69,7 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
     _i2c_expander01_write6(1, _vvv6x2 + 6);
     _i2c_expander01_read6(2, _up6x2);
     _i2c_expander01_read6(3, _up6x2 + 6 );
-    _CB_PR_12hex(",Pos:", _cidx , _up6x2);
+    _CB_PR_12hex(", Pos:", _cidx , _up6x2);
 
     _bit_or( 12, _vvv6x2, _inv6x2, _ttt6x2 );
 
@@ -77,7 +79,7 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
         _CB_PR_12hex_rn(" failed. it should be : ", __ii , _ttt6x2);
         __rt ++ ;
     } else {
-        _CB_PR_str(" ok. Neg ");
+        _CB_PR_str(" ok.");
     }
 
     _bit_inv( 12, _vvv6x2, _ttt6x2 );
@@ -88,15 +90,23 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
     _i2c_expander01_write6(1, _ttt6x2 + 6);
     _i2c_expander01_read6(2, _up6x2);
     _i2c_expander01_read6(3, _up6x2 + 6 );
-    _CB_PR_12hex(" ok; Neg : ", _cidx , _up6x2);
+    _CB_PR_12hex(" Neg : ", _cidx , _up6x2);
 
     __ii = _byte_cmp(12, _ttt6x2, _up6x2 );
     if ( __ii ) {
-        _CB_PR_12hex_rn(" failed, it should be : ", __ii , _ttt6x2);
+        _CB_PR_12hex(" failed, it should be : ", __ii , _ttt6x2);
+        __rt ++ ;
+    }
+
+    if ( __rt ) {
+        _cBad ++ ;
+        _CB_PR_1hex_rn(". bad.========", "", _cBad );
         return 92 ;
     }
 
-    _CB_PR_str_rn(" ok.");
+    _cGood ++ ;
+    //_CB_PR_str_rn(" ok.----------------------------------" );
+    _CB_PR_1hex_rn(" ok.----------------------------------", "", _cGood );
     return 0 ;
 } // _cable_tester_mainloop_onceX3Y
 
@@ -166,6 +176,8 @@ uint8_t _cable_tester_mainloop_onceX3(void){
     _CB_PR_1hex_rn("==X3== total amount of the wires : ", "<-- it should be 0x20(32)", _wireAmount );
 
     _crt = 0 ;
+    _cGood = 0 ;
+    _cBad = 0 ;
     for ( _cidx = 0 ; _cidx < _wireAmount ; _cidx ++ ){
         if ( _cable_tester_mainloop_onceX3Y()) {
             _crt ++;
