@@ -11,8 +11,11 @@ void main_init(void){
     // Stop watchdog timer
     WDT_A_hold(WDT_A_BASE);
 
-    _led_red_set_output();
-    _led_green_set_output();
+    //_led_red_set_output();
+    //_led_green_set_output();
+    // "_led_all.h"
+    _LED_red_set_out();
+    _LED_green_set_out();
 
     //_i2c01_init();
     _I2C01_INIT();

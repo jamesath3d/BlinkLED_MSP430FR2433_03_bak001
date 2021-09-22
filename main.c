@@ -7,8 +7,10 @@ int main(void) {
 
     //volatile uint32_t i;
     //volatile uint32_t j;
-    volatile uint8_t i,j;
+    uint8_t i,j;
+    uint8_t __rt ;
 
+    // "_led_all.h"
     main_init();
 
 
@@ -19,6 +21,8 @@ int main(void) {
     while(1)
     {
         _led_red_toggle();
+        //_LED_red_on();
+        //_LED_red_off();
 
         _cable_tester_mainloop_once();
 
