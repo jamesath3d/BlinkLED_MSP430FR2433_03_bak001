@@ -25,19 +25,22 @@ static uint8_t _ttt6x2[12];
 
 inline uint8_t _cable_tester_mainloop_onceZ(uint8_t ___idx, uint8_t ___arr6[], uint8_t ___rowIdx ){
     return 0;
-}
+} // _cable_tester_mainloop_onceZ
 
 inline uint8_t _cable_tester_mainloop_onceX3Y(void){
     uint8_t __ii;
     uint8_t __jj;
     uint8_t __mm;
+    uint8_t __rt;
 
+    __rt = 0 ;
     _byte_set(12, _vvv6x2 , 0 );
 
     __mm=_cidx;
     for (__ii=0; __ii < 12 ; __ii ++){
         __jj = _bit_count(_fff6x2[__ii]);
         if ( __mm < __jj ) {
+            _vvv6x2[__ii] = _bit_set(__mm);
             break ;
         }
         __mm -= __jj ;
@@ -51,7 +54,6 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
         _CB_PR_1hex(" mm:", " ", __mm);
     }
 
-    _vvv6x2[__ii] = _bit_set(__mm);
 
     _CB_PR_12hex("wire vector : ", _cidx , _vvv6x2);
     if ( 12 == __ii ) {
@@ -65,15 +67,17 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
     _i2c_expander01_write6(1, _vvv6x2 + 6);
     _i2c_expander01_read6(2, _up6x2);
     _i2c_expander01_read6(3, _up6x2 + 6 );
-    _CB_PR_12hex(", Pos : ", _cidx , _up6x2);
+    _CB_PR_12hex(",Pos:", _cidx , _up6x2);
 
     _bit_or( 12, _vvv6x2, _inv6x2, _ttt6x2 );
 
     __ii = _byte_cmp(12, _ttt6x2, _up6x2 );
 
     if ( __ii ) {
-        _CB_PR_12hex_rn(" failed, it should be : ", __ii , _ttt6x2);
-        return 91 ;
+        _CB_PR_12hex_rn(" failed. it should be : ", __ii , _ttt6x2);
+        __rt ++ ;
+    } else {
+        _CB_PR_str(" ok. Neg ");
     }
 
     _bit_inv( 12, _vvv6x2, _ttt6x2 );
@@ -92,9 +96,9 @@ inline uint8_t _cable_tester_mainloop_onceX3Y(void){
         return 92 ;
     }
 
-    _CB_PR_rn();
+    _CB_PR_str_rn(" ok.");
     return 0 ;
-}
+} // _cable_tester_mainloop_onceX3Y
 
 // test the i2c bus's slave device and all the pins of the io-expanders.
 uint8_t _cable_tester_mainloop_onceX1(void){ 
@@ -161,12 +165,15 @@ uint8_t _cable_tester_mainloop_onceX3(void){
     }
     _CB_PR_1hex_rn("==X3== total amount of the wires : ", "<-- it should be 0x20(32)", _wireAmount );
 
+    _crt = 0 ;
     for ( _cidx = 0 ; _cidx < _wireAmount ; _cidx ++ ){
-        _crt = _cable_tester_mainloop_onceX3Y();
-        if ( _crt ){
-            _CB_err_return3( "error found at NO.(", "), please check it. Exit....", 32 );
+        if ( _cable_tester_mainloop_onceX3Y()) {
+            _crt ++;
         }
     }
+    if ( _crt ){
+            _CB_err_return3( "error found at NO.(", "), please check it. Exit....", 32 );
+        }
 
     _CB_PR_str( "All looks good. Sleep. 20 seconds later will try again.\r\n")
     return 0 ;

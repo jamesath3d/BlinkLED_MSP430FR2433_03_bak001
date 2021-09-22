@@ -13,6 +13,7 @@
 uint8_t _cable_tester_mainloop_once(void);
 
 #define _CB_PR_str(aaa)                     { _uart_p1_5_tx_only_put_str(aaa); }
+#define _CB_PR_str_rn(aaa)                  { _uart_p1_5_tx_only_put_str(aaa "\r\n"); }
 #define _CB_PR_uint32(aaa)                  { _uart_p1_5_tx_only_put_uint32(aaa); }
 #define _CB_PR_uint8(aaa)                   { _uart_p1_5_tx_only_put_hex(aaa); }
 #define _uart_p1_5_tx_only_put_hex_u8X(aaa) { _uart_p1_5_tx_only_put_ch(' '); _uart_p1_5_tx_only_put_hex_u8(aaa); _uart_p1_5_tx_only_put_ch(' '); }
